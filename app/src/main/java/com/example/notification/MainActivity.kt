@@ -1,6 +1,8 @@
 package com.example.notification
 
 import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
@@ -26,12 +28,15 @@ lateinit var builder:NotificationCompat.Builder
     }
     fun btnclick(v:View){
 
+val intent=Intent(this,MainActivity2::class.java)
+val pendingIntent=PendingIntent.getActivity(applicationContext,101,intent ,PendingIntent.FLAG_UPDATE_CURRENT)
+
        builder=NotificationCompat.Builder(this,"n_channel")
            .setContentTitle("just a title")
            .setContentText("just a body")
            .setLargeIcon(getmyBitmap(R.drawable.noti))
            .setSmallIcon(R.drawable.ic_stat_name)
-
+           .setContentIntent()
     }
 
     private fun getmyBitmap(imgres: Int): Bitmap {
