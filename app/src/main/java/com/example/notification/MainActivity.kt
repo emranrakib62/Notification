@@ -1,72 +1,121 @@
 package com.example.notification
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
+import com.example.notification.databinding.ActivityMainBinding
+
+
+import android.app.*
+import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
+import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
-import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
-import android.view.View
+import android.Manifest
+import android.util.Log
 import android.widget.Button
-import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
-import androidx.core.content.res.ResourcesCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import androidx.core.content.ContextCompat
+
 
 class MainActivity : AppCompatActivity() {
 
-lateinit var notificationManager:NotificationManager
-lateinit var builder:NotificationCompat.Builder
-lateinit var btnnotif:Button
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContentView(R.layout.activity_main)
-        notificationManager=getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-          btnnotif=findViewById(R.id.btnnotif)
+    private lateinit var btnNotif: Button
+    private lateinit var binding: ActivityMainBinding
 
-        btnnotif.setOnClickListener {
+    // Notification variables
+    private lateinit var notificationManager: NotificationManager
+    private lateinit var builder: NotificationCompat.Builder
+    private val channelId = "1.apps.notifications"
+    private val description = "Test notification"
 
-            val intent=Intent(this,MainActivity2::class.java)
-            intent.putExtra("key","From Notification")
-
-            val pendingIntent=PendingIntent.getActivity(applicationContext,101,
-                intent ,
-                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-
-            )
-
-            builder=NotificationCompat.Builder(this,"n_channel")
-                .setContentTitle("just a title")
-                .setContentText("just a body")
-                .setLargeIcon(getmyBitmap(R.drawable.noti))
-                .setSmallIcon(R.drawable.ic_stat_name)
-                .setContentIntent(pendingIntent)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                notificationManager.createNotificationChannel(NotificationChannel("n_channel","",NotificationManager.IMPORTANCE_HIGH))
+    // Permission launcher
+    private val requestPermissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted: Boolean ->
+            if (isGranted) {
+                Log.i("Permission", "Granted")
+                showNotification()
+            } else {
+                Log.i("Permission", "Denied")
             }
-            val id=System.currentTimeMillis().toInt()
-
-            notificationManager.notify(id,builder.build())
-
-
-
         }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
+        notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        btnNotif = findViewById(R.id.btnNotif)
+
+        btnNotif.setOnClickListener {
+            onClickRequestPermission()
+        }
     }
 
+    private fun onClickRequestPermission() {
+        when {
+            ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED -> {
+                showNotification()
+            }
 
+            ActivityCompat.shouldShowRequestPermissionRationale(
+                this,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) -> {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                }
+            }
 
-    private fun getmyBitmap(imgres: Int): Bitmap {
+            else -> {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                }
+            }
+        }
+    }
 
-        return BitmapFactory.decodeResource(resources,imgres)
+    private fun showNotification() {
+        val intent = Intent(this, MainActivity::class.java)
+        val pendingIntent = PendingIntent.getActivity(
+            this, 0, intent,
+            PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val notificationChannel = NotificationChannel(
+                channelId, description, NotificationManager.IMPORTANCE_HIGH
+            )
+            notificationChannel.enableLights(true)
+            notificationChannel.lightColor = Color.GREEN
+            notificationChannel.enableVibration(true)
+            notificationManager.createNotificationChannel(notificationChannel)
+        }
+
+        builder = NotificationCompat.Builder(this, channelId)
+            .setSmallIcon(R.drawable.ic_stat_name)
+            .setContentTitle("Title")
+            .setContentText("This is a test notification.")
+            .setAutoCancel(true)
+            .setLargeIcon(
+                BitmapFactory.decodeResource(
+                    this.resources,
+                    R.drawable.noti
+                )
+            )
+            .setContentIntent(pendingIntent)
+
+        val id = System.currentTimeMillis().toInt()
+        notificationManager.notify(id, builder.build())
     }
 }
