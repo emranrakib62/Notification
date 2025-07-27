@@ -5,6 +5,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.os.Build
@@ -65,8 +66,7 @@ lateinit var btnnotif:Button
 
 
     private fun getmyBitmap(imgres: Int): Bitmap {
-val drawable:Drawable? =ResourcesCompat.getDrawable(resources,imgres,null)
-var drBitmap:BitmapDrawable=drawable as BitmapDrawable
-        return drBitmap.bitmap
+
+        return BitmapFactory.decodeResource(resources,imgres)
     }
 }
