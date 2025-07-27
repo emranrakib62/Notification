@@ -35,7 +35,11 @@ lateinit var btnnotif:Button
             val intent=Intent(this,MainActivity2::class.java)
             intent.putExtra("key","From Notification")
 
-            val pendingIntent=PendingIntent.getActivity(applicationContext,101,intent ,PendingIntent.FLAG_UPDATE_CURRENT)
+            val pendingIntent=PendingIntent.getActivity(applicationContext,101,
+                intent ,
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+
+            )
 
             builder=NotificationCompat.Builder(this,"n_channel")
                 .setContentTitle("just a title")
@@ -59,12 +63,6 @@ lateinit var btnnotif:Button
     }
 
 
-
-
-    fun btnclick(v:View){
-
-
-    }
 
     private fun getmyBitmap(imgres: Int): Bitmap {
 val drawable:Drawable? =ResourcesCompat.getDrawable(resources,imgres,null)
