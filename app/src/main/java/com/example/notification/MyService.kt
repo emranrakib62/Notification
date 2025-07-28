@@ -30,7 +30,7 @@ class MyService : FirebaseMessagingService() {
         val title = message.notification?.title ?: "No Title"
         val body = message.notification?.body ?: "No Body"
 
-        showNotification(title, body)
+        showNotification(title!!, body!!)
     }
 
     private fun showNotification(title: String, body: String) {
