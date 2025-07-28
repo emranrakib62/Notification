@@ -1,42 +1,27 @@
 package com.example.notification
 
-import com.example.notification.databinding.ActivityMainBinding
-
-
-import android.app.*
-import android.content.Context
-import android.content.Intent
+import android.Manifest
 import android.content.pm.PackageManager
-import android.graphics.BitmapFactory
-import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
-import android.Manifest
 import android.util.Log
 import android.widget.Button
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
-
+import com.example.notification.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var btnNotif: Button
     private lateinit var binding: ActivityMainBinding
 
-    // Notification variables
-
-
-    // Permission launcher
     private val requestPermissionLauncher =
-        registerForActivityResult(
-            ActivityResultContracts.RequestPermission()
-        ) { isGranted: Boolean ->
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             if (isGranted) {
                 Log.i("Permission", "Granted")
-                showNotification()
+                // You can trigger notification here if needed
             } else {
                 Log.i("Permission", "Denied")
             }
@@ -47,7 +32,6 @@ class MainActivity : AppCompatActivity() {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
 
         btnNotif = findViewById(R.id.btnNotif)
 
@@ -62,7 +46,8 @@ class MainActivity : AppCompatActivity() {
                 this,
                 Manifest.permission.POST_NOTIFICATIONS
             ) == PackageManager.PERMISSION_GRANTED -> {
-                showNotification()
+                // Permission already granted
+                Log.i("Permission", "Already granted")
             }
 
             ActivityCompat.shouldShowRequestPermissionRationale(
@@ -81,6 +66,4 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
-
 }
