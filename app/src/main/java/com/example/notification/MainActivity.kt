@@ -27,10 +27,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
     // Notification variables
-    private lateinit var notificationManager: NotificationManager
-    private lateinit var builder: NotificationCompat.Builder
-    private val channelId = "1.apps.notifications"
-    private val description = "Test notification"
+
 
     // Permission launcher
     private val requestPermissionLauncher =
@@ -51,7 +48,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
         btnNotif = findViewById(R.id.btnNotif)
 
         btnNotif.setOnClickListener {
@@ -85,37 +82,5 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun showNotification() {
-        val intent = Intent(this, MainActivity::class.java)
-        val pendingIntent = PendingIntent.getActivity(
-            this, 0, intent,
-            PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-        )
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val notificationChannel = NotificationChannel(
-                channelId, description, NotificationManager.IMPORTANCE_HIGH
-            )
-            notificationChannel.enableLights(true)
-            notificationChannel.lightColor = Color.GREEN
-            notificationChannel.enableVibration(true)
-            notificationManager.createNotificationChannel(notificationChannel)
-        }
-
-        builder = NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(R.drawable.ic_stat_name)
-            .setContentTitle("Title")
-            .setContentText("This is a test notification.")
-            .setAutoCancel(true)
-            .setLargeIcon(
-                BitmapFactory.decodeResource(
-                    this.resources,
-                    R.drawable.noti
-                )
-            )
-            .setContentIntent(pendingIntent)
-
-        val id = System.currentTimeMillis().toInt()
-        notificationManager.notify(id, builder.build())
-    }
 }
